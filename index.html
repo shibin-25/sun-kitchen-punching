@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Punching Machine - Sun Kitchen Equipment</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        .container { max-width: 400px; margin: auto; }
+        button { margin-top: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Sun Kitchen Equipment - Online Punching</h2>
+        <input type="text" id="name" placeholder="Enter your name" required><br>
+        <input type="text" id="mobile" placeholder="Enter your mobile number" required><br>
+        <button onclick="registerUser()">Register</button>
+        <hr>
+        <button onclick="punchIn()">Punch In</button>
+        <button onclick="punchOut()">Punch Out</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        let registeredUsers = {};
+
+        function registerUser() {
+            let name = document.getElementById('name').value;
+            let mobile = document.getElementById('mobile').value;
+            if (name && mobile) {
+                registeredUsers[mobile] = name;
+                alert("Registered Successfully!");
+            } else {
+                alert("Please enter both name and mobile number.");
+            }
+        }
+
+        function getLocation(callback) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        callback(position.coords.latitude, position.coords.longitude);
+                    }, 
+                    error => {
+                        alert("Location access denied!");
+                    }
+                );
+            } else {
+                alert("Geolocation not supported.");
+            }
+        }
+
+        function punchIn() {
+            let mobile = document.getElementById('mobile').value;
+            if (!registeredUsers[mobile]) {
+                alert("User not registered!");
+                return;
+            }
+            getLocation((lat, long) => {
+                document.getElementById('status').innerText = `Punched In at ${new Date().toLocaleTimeString()}`;
+                console.log(`Punch In: ${registeredUsers[mobile]} (${mobile}) at Lat:${lat}, Long:${long}`);
+            });
+        }
+
+        function punchOut() {
+            let mobile = document.getElementById('mobile').value;
+            if (!registeredUsers[mobile]) {
+                alert("User not registered!");
+                return;
+            }
+            document.getElementById('status').innerText = `Punched Out at ${new Date().toLocaleTimeString()}`;
+            console.log(`Punch Out: ${registeredUsers[mobile]} (${mobile})`);
+        }
+    </script>
+</body>
+</html>
