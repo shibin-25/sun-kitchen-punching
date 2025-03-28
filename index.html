@@ -51,27 +51,40 @@
             }
         }
 
-        function punchIn() {
-            let mobile = document.getElementById('mobile').value;
-            if (!registeredUsers[mobile]) {
-                alert("User not registered!");
-                return;
-            }
-            getLocation((lat, long) => {
-                document.getElementById('status').innerText = `Punched In at ${new Date().toLocaleTimeString()}`;
-                console.log(`Punch In: ${registeredUsers[mobile]} (${mobile}) at Lat:${lat}, Long:${long}`);
-            });
-        }
+      function sendToSheet(name, mobile, punchType, location) {
+    fetch("https://script.google.com/macros/s/AKfycbzTcAo9Or9IX6Cwhj0l4sLozF9UNC2IkzT_jcWpJiQc_ni2BsBcmj4w2IMfJJcViHic/exec
+", {
+        method: "POST",
+        body: JSON.stringify({ name, mobile, punchType, location }),
+        headers: { "Content-Type": "application/json" }
+    }).then(response => response.text())
+      .then(data => console.log("Google Sheets Response:", data))
+      .catch(error => console.error("Error:", error));
+}
 
-        function punchOut() {
-            let mobile = document.getElementById('mobile').value;
-            if (!registeredUsers[mobile]) {
-                alert("User not registered!");
-                return;
-            }
-            document.getElementById('status').innerText = `Punched Out at ${new Date().toLocaleTimeString()}`;
-            console.log(`Punch Out: ${registeredUsers[mobile]} (${mobile})`);
-        }
+function punchIn() {
+    let mobile = document.getElementById('mobile').value;
+    if (!registeredUsers[mobile]) {
+        alert("User not registered!");
+        return;
+    }
+    getLocation((lat, long) => {
+        document.getElementById('status').innerText = `Punched In at ${new Date().toLocaleTimeString()}`;
+        let location = `Lat:${lat}, Long:${long}`;
+        sendToSheet(registeredUsers[mobile], mobile, "IN", location);
+    });
+}
+
+function punchOut() {
+    let mobile = document.getElementById('mobile').value;
+    if (!registeredUsers[mobile]) {
+        alert("User not registered!");
+        return;
+    }
+    document.getElementById('status').innerText = `Punched Out at ${new Date().toLocaleTimeString()}`;
+    sendToSheet(registeredUsers[mobile], mobile, "OUT", "N/A");
+}
+
     </script>
 </body>
 </html>
